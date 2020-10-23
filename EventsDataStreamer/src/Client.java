@@ -3,8 +3,10 @@ import com.mongodb.*;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,26 +14,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class Client {
 
-    static int i = 0;
-
     public static void main(String[] args) {
         Client groupsClient = new Client();
-//        groupsClient.getGroupsPerState(20);
-//        groupsClient.getEvents("Control-Irrational-Emotions-Find-Happiness-and-Confidence");
-        groupsClient.getEventsPerGroup();
+        if (Property.getTestDataOnly) {
+            groupsClient.getGroupsPerState(20);
+            groupsClient.getEventsPerGroup();
+        } else {
+            groupsClient.getGroupsPerState(1000000);
+            groupsClient.getEventsPerGroup();
+        }
     }
 
     public void getGroupsPerState(int pageSize) {
         for (String us_state : Property.US_STATES) {
-            if (i < 5) {
-                i++;
-                continue;
-            }
             System.out.println("STATE: " + us_state);
             this.getGroups(us_state, pageSize);
             return;
@@ -64,10 +65,16 @@ public class Client {
             System.out.println("Response:-" + response.toString());
 
             //save groups to mongo.
-            MongoClient mongoClient = new MongoClient("localhost", 27017);
-            MongoDatabase database = mongoClient.getDatabase("covidData");
+
+            MongoClient mongoClient;
+            if (StringUtils.isNotBlank(Property.mongoUser) && StringUtils.isNotBlank(Property.mongoPassword)) {
+                MongoCredential credential = MongoCredential.createCredential(Property.mongoUser, Property.mongoDatabaseName, Property.mongoPassword.toCharArray());
+                mongoClient = new MongoClient(new ServerAddress("host1", Property.mongoPort), Arrays.asList(credential));
+            } else {
+                mongoClient = new MongoClient(Property.mongoIPAddress, Property.mongoPort);
+            }
+            MongoDatabase database = mongoClient.getDatabase(Property.mongoDatabaseName);
             System.out.println("db created");
-//            boolean auth = database.authenticate("username", "pwd".toCharArray());
             mongoClient.getDatabaseNames().forEach(System.out::println);
             System.out.println("^^^list of dbs.");
             MongoCollection<Document> collection = database.getCollection("groups");
@@ -92,9 +99,10 @@ public class Client {
         }
 
     }
-    public void getEventsPerGroup(){
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
-        MongoDatabase database = mongoClient.getDatabase("covidData");
+
+    public void getEventsPerGroup() {
+        MongoClient mongoClient = new MongoClient(Property.mongoIPAddress, Property.mongoPort);
+        MongoDatabase database = mongoClient.getDatabase(Property.mongoDatabaseName);
         MongoCollection<Document> collection = database.getCollection("groups");
 
         BasicDBObject allQuery = new BasicDBObject();
@@ -105,8 +113,8 @@ public class Client {
             group.id = document.getInteger("id");
 
             System.out.println();
-            System.out.println(">>>>>>>>>>"+group.urlname);
-            System.out.println(">>>>>>>>>>"+group.id);
+            System.out.println(">>>>>>>>>>" + group.urlname);
+            System.out.println(">>>>>>>>>>" + group.id);
             System.out.println();
             System.out.println(getEvents(database, group));
         }
