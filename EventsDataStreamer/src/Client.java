@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Client {
@@ -73,12 +75,14 @@ public class Client {
 
 //            JsonArray jsonArray = new JsonParser().parse(response.toString()).getAsJsonArray();
             Group[] groups = new Gson().fromJson(response.toString(), Group[].class);
-            List<Document> jsonList = new ArrayList<Document>();
-            for (Group group : groups) {
-                Document document = Document.parse(new Gson().toJson(group));
-                jsonList.add(document);
+            if (groups.length > 1) {
+                List<Document> jsonList = new ArrayList<Document>();
+                for (Group group : groups) {
+                    Document document = Document.parse(new Gson().toJson(group));
+                    jsonList.add(document);
+                }
+                collection.insertMany(jsonList);
             }
-            collection.insertMany(jsonList);
             System.out.println("Saved to mongo.");
             mongoClient.close();
 
@@ -96,20 +100,23 @@ public class Client {
         BasicDBObject allQuery = new BasicDBObject();
         FindIterable<Document> documents = collection.find(allQuery, Document.class);
         for (Document document : documents) {
-            String urlname = document.getString("urlname");
+            Group group = new Group();
+            group.urlname = document.getString("urlname");
+            group.id = document.getInteger("id");
+
             System.out.println();
-            System.out.println(">>>>>>>>>>"+urlname);
+            System.out.println(">>>>>>>>>>"+group.urlname);
+            System.out.println(">>>>>>>>>>"+group.id);
             System.out.println();
-            System.out.println(getEvents(urlname, mongoClient));
+            System.out.println(getEvents(database, group));
         }
+        System.out.println("Saved, closing mongo connection");
         mongoClient.close();
     }
 
-    public String getEvents(String groupName, MongoClient mongoClient) {
+    public String getEvents(MongoDatabase database, Group group) {
         try {
-
-
-            String path = "https://api.meetup.com/" + groupName + "/events";
+            String path = "https://api.meetup.com/" + group.urlname + "/events";
             System.out.println(path);
             // Sending get request
             URL url = new URL(path);
@@ -130,8 +137,25 @@ public class Client {
             in.close();
             // printing result from response
             System.out.println("Response:-" + response.toString());
-            return response.toString();
 
+            MongoCollection<Document> collection = database.getCollection("events");
+            Event[] events = new Gson().fromJson(response.toString(), Event[].class);
+            if (events.length > 0) {
+                List<Document> jsonList = new ArrayList<Document>();
+                for (Event event : events) {
+                    event.group_id = group.id;
+                    event.urlname = group.urlname;
+                    event.dt_time = new Date(event.time);
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    event.st_time = sdf.format(new Date(event.time));
+
+                    Document document = Document.parse(new Gson().toJson(event));
+                    jsonList.add(document);
+                }
+                collection.insertMany(jsonList);
+            }
+
+            return response.toString();
         } catch (IOException e) {
             System.out.println(">>>>Failed");
             e.printStackTrace();
