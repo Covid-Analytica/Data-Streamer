@@ -5,7 +5,7 @@ public class Property {
 
     final static boolean getTestDataOnly = true; //much faster than full data.//gets smaller dataset.
 
-    final static String mongoDateFormat = "YYYYMMDD";
+    final static String mongoDateFormat = "yyyyMMdd";
 
     final static String mongoHost = "127.0.0.1";
     final static int mongoPort = 27017;
