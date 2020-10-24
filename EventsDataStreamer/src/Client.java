@@ -154,7 +154,7 @@ public class Client {
                     event.group_id = group.id;
                     event.urlname = group.urlname;
                     event.dt_time = new Date(event.time);
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat sdf = new SimpleDateFormat(Property.mongoDateFormat);
                     event.st_time = sdf.format(new Date(event.time));
 
                     Document document = Document.parse(new Gson().toJson(event));
