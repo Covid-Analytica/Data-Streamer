@@ -20,11 +20,19 @@ public class Event {
     //fields from Group.
     public Integer group_id;
     public String urlname;
+    public String state;
 
     public Event() {
     }
 
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public Long getCreated() {
         return created;

@@ -23,18 +23,23 @@ public class Client {
     public static void main(String[] args) {
         Client groupsClient = new Client();
         if (Property.getTestDataOnly) {
-            groupsClient.getGroupsPerState(20);
+            groupsClient.getGroupsPerState(10);
             groupsClient.getEventsPerGroup();
         } else {
-            groupsClient.getGroupsPerState(1000000);
+            groupsClient.getGroupsPerState(100);
             groupsClient.getEventsPerGroup();
         }
     }
 
     public void getGroupsPerState(int pageSize) {
+        int i = 0;
         for (String us_state : Property.US_STATES) {
             System.out.println("STATE: " + us_state);
             this.getGroups(us_state, pageSize);
+            i++;
+            if (i == 5 && Property.getTestDataOnly) {
+                break;
+            }
             //return;
         }
     }
@@ -109,6 +114,7 @@ public class Client {
         for (Document document : documents) {
             Group group = new Group();
             group.urlname = document.getString("urlname");
+            group.state = document.getString("state");
             group.id = document.getInteger("id");
 
             System.out.println();
@@ -152,6 +158,7 @@ public class Client {
                 for (Event event : events) {
                     event.group_id = group.id;
                     event.urlname = group.urlname;
+                    event.state = group.state;
                     event.dt_time = new Date(event.time);
                     SimpleDateFormat sdf = new SimpleDateFormat(Property.mongoDateFormat);
                     event.st_time = sdf.format(new Date(event.time));
