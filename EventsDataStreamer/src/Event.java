@@ -9,7 +9,7 @@ public class Event {
     public String status;
     public Long time;
     public Date dt_time;//not coming from api
-    public String st_time;//not coming from api
+    public int st_time;//not coming from api
     public String local_date;
     public String local_time;
     public Integer waitlist_count;
@@ -98,11 +98,11 @@ public class Event {
         this.dt_time = dt_time;
     }
 
-    public String getSt_time() {
+    public int getSt_time() {
         return st_time;
     }
 
-    public void setSt_time(String st_time) {
+    public void setSt_time(int st_time) {
         this.st_time = st_time;
     }
 

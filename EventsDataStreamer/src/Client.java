@@ -161,7 +161,8 @@ public class Client {
                     event.state = group.state;
                     event.dt_time = new Date(event.time);
                     SimpleDateFormat sdf = new SimpleDateFormat(Property.mongoDateFormat);
-                    event.st_time = sdf.format(new Date(event.time));
+                    String eventDate = sdf.format(new Date(event.time));
+                    event.st_time = Integer.parseInt(eventDate);
 
                     Document document = Document.parse(new Gson().toJson(event));
                     jsonList.add(document);
