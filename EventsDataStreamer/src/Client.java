@@ -35,7 +35,7 @@ public class Client {
         for (String us_state : Property.US_STATES) {
             System.out.println("STATE: " + us_state);
             this.getGroups(us_state, pageSize);
-            return;
+            //return;
         }
     }
 
@@ -69,15 +69,15 @@ public class Client {
             MongoClient mongoClient;
             if (StringUtils.isNotBlank(Property.mongoUser) && StringUtils.isNotBlank(Property.mongoPassword)) {
                 MongoCredential credential = MongoCredential.createCredential(Property.mongoUser, Property.mongoDatabaseName, Property.mongoPassword.toCharArray());
-                mongoClient = new MongoClient(new ServerAddress("host1", Property.mongoPort), Arrays.asList(credential));
+                mongoClient = new MongoClient(new ServerAddress(Property.mongoHost, Property.mongoPort), Arrays.asList(credential));
             } else {
-                mongoClient = new MongoClient(Property.mongoIPAddress, Property.mongoPort);
+                mongoClient = new MongoClient(Property.mongoHost, Property.mongoPort);
             }
             MongoDatabase database = mongoClient.getDatabase(Property.mongoDatabaseName);
             System.out.println("db created");
             mongoClient.getDatabaseNames().forEach(System.out::println);
             System.out.println("^^^list of dbs.");
-            MongoCollection<Document> collection = database.getCollection("groups");
+            MongoCollection<Document> collection = database.getCollection(Property.MongoCollectionGroup);
             System.out.println("created collection");
 
 //            JsonArray jsonArray = new JsonParser().parse(response.toString()).getAsJsonArray();
@@ -101,10 +101,9 @@ public class Client {
     }
 
     public void getEventsPerGroup() {
-        MongoClient mongoClient = new MongoClient(Property.mongoIPAddress, Property.mongoPort);
+        MongoClient mongoClient = new MongoClient(Property.mongoHost, Property.mongoPort);
         MongoDatabase database = mongoClient.getDatabase(Property.mongoDatabaseName);
-        MongoCollection<Document> collection = database.getCollection("groups");
-
+        MongoCollection<Document> collection = database.getCollection(Property.MongoCollectionGroup);
         BasicDBObject allQuery = new BasicDBObject();
         FindIterable<Document> documents = collection.find(allQuery, Document.class);
         for (Document document : documents) {
@@ -146,7 +145,7 @@ public class Client {
             // printing result from response
             System.out.println("Response:-" + response.toString());
 
-            MongoCollection<Document> collection = database.getCollection("events");
+            MongoCollection<Document> collection = database.getCollection(Property.MongoCollectionEvents);
             Event[] events = new Gson().fromJson(response.toString(), Event[].class);
             if (events.length > 0) {
                 List<Document> jsonList = new ArrayList<Document>();

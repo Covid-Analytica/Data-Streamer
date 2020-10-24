@@ -5,13 +5,14 @@ public class Property {
 
     final static boolean getTestDataOnly = true; //much faster than full data.//gets smaller dataset.
 
-    final static String mongoDatabaseName = "covidData";
-    final static String mongoIPAddress = "localhost";
-    final static int mongoPort = 27017;
-
     final static String mongoDateFormat = "YYYYMMDD";
 
-    //untested.
-    final static String mongoUser = null;
-    final static String mongoPassword = null;
+    final static String mongoHost = "127.0.0.1";
+    final static int mongoPort = 27017;
+    final static String mongoUser = "";
+    final static String mongoPassword = "";
+    final static String mongoDatabaseName = "DataIntensive_DB";
+
+    final static String MongoCollectionGroup = "groups";
+    final static String MongoCollectionEvents = "events";
 }
