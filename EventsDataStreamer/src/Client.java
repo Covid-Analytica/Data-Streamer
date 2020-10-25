@@ -164,10 +164,15 @@ public class Client {
                     String eventDate = sdf.format(new Date(event.time));
                     event.st_time = Integer.parseInt(eventDate);
 
+                    if (event.is_online_event) {
+                        continue;
+                    }
                     Document document = Document.parse(new Gson().toJson(event));
                     jsonList.add(document);
                 }
-                collection.insertMany(jsonList);
+                if (jsonList.size() > 0) {
+                    collection.insertMany(jsonList);
+                }
             }
 
             return response.toString();
