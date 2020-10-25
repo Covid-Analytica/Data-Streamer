@@ -129,7 +129,7 @@ public class Client {
 
     public String getEvents(MongoDatabase database, Group group) {
         try {
-            String path = "https://api.meetup.com/" + group.urlname + "/events?status=past";
+            String path = "https://api.meetup.com/" + group.urlname + "/events?no_earlier_than=2020-02-15T00:00:00.000&status=past";
             System.out.println(path);
             // Sending get request
             URL url = new URL(path);
