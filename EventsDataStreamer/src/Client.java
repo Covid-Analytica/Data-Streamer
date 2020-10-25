@@ -23,7 +23,7 @@ public class Client {
     public static void main(String[] args) {
         Client groupsClient = new Client();
         if (Property.getTestDataOnly) {
-            groupsClient.getGroupsPerState(10);
+            groupsClient.getGroupsPerState(20);
             groupsClient.getEventsPerGroup();
         } else {
             groupsClient.getGroupsPerState(100);
@@ -46,7 +46,7 @@ public class Client {
 
 
     public void getGroups(String usState, int pageSize) {
-        String path = "https://api.meetup.com/find/groups?country=United%20States&location=" + usState + "&page=" + Integer.toString(pageSize);
+        String path = "https://api.meetup.com/find/groups?country=United%20States&location=" + usState + "&order=most_active&page=" + Integer.toString(pageSize);
         System.out.println(path);
         try {
             // Sending get request
@@ -129,7 +129,7 @@ public class Client {
 
     public String getEvents(MongoDatabase database, Group group) {
         try {
-            String path = "https://api.meetup.com/" + group.urlname + "/events?no_earlier_than=2020-02-15T00:00:00.000&status=past";
+            String path = "https://api.meetup.com/" + group.urlname + "/events?no_earlier_than=2020-02-15T00:00:00.000&page=90000&status=past";
             System.out.println(path);
             // Sending get request
             URL url = new URL(path);
@@ -164,10 +164,15 @@ public class Client {
                     String eventDate = sdf.format(new Date(event.time));
                     event.st_time = Integer.parseInt(eventDate);
 
+                    if (event.is_online_event) {
+                        continue;
+                    }
                     Document document = Document.parse(new Gson().toJson(event));
                     jsonList.add(document);
                 }
-                collection.insertMany(jsonList);
+                if (jsonList.size() > 0) {
+                    collection.insertMany(jsonList);
+                }
             }
 
             return response.toString();
