@@ -37,6 +37,7 @@ object Data {
 
 
   def getEvents(date: Integer): RDD[(AnyRef, Integer)]  = {
+    SparkSession.clearActiveSession()
     val spark = SparkSession.builder()
       .master("local")
       .appName("Events")
@@ -45,8 +46,8 @@ object Data {
 
     val readConfig = ReadConfig(Map("collection" -> "events"), Some(ReadConfig(spark.sparkContext)))
     val rdd = MongoSpark.load(spark.sparkContext, readConfig)
-
     val sc = spark.sparkContext
+    //println(rdd.count())
 
     //val rdd = MongoSpark.load(sc)
 
