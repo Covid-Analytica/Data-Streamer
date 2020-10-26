@@ -164,7 +164,7 @@ public class Client {
                     String eventDate = sdf.format(new Date(event.time));
                     event.st_time = Integer.parseInt(eventDate);
 
-                    if (event.is_online_event) {
+                    if (event.is_online_event != null && event.is_online_event) {
                         continue;
                     }
                     Document document = Document.parse(new Gson().toJson(event));
