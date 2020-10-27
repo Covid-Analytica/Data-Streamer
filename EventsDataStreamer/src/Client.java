@@ -40,7 +40,6 @@ public class Client {
             if (i == 5 && Property.getTestDataOnly) {
                 break;
             }
-            //return;
         }
     }
 
@@ -85,7 +84,6 @@ public class Client {
             MongoCollection<Document> collection = database.getCollection(Property.MongoCollectionGroup);
             System.out.println("created collection");
 
-//            JsonArray jsonArray = new JsonParser().parse(response.toString()).getAsJsonArray();
             Group[] groups = new Gson().fromJson(response.toString(), Group[].class);
             if (groups.length > 1) {
                 List<Document> jsonList = new ArrayList<Document>();
@@ -182,36 +180,4 @@ public class Client {
         }
         return null;
     }
-
-    /*public static void try1(){
-
-        String state = "";
-        String path = "https://api.meetup.com/find/groups?zip=90001&page=200000";
-
-        //Creating a HttpClient object
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-
-        //Creating a HttpGet object
-        HttpGet httpget = new HttpGet(path);
-
-
-        //Executing the Get request
-        HttpResponse httpresponse;
-
-        {
-            try {
-                httpresponse = httpclient.execute(httpget);
-            } catch (IOException e) {
-                System.out.println("Error while making request");
-            }
-        }
-
-        Scanner sc = new Scanner(httpresponse.getEntity().getContent());
-
-        //Printing the status line
-        System.out.println(httpresponse.getStatusLine());
-        while(sc.hasNext()) {
-            System.out.println(sc.nextLine());
-        }
-    }*/
 }
