@@ -1,13 +1,13 @@
-# Data-Streamer
+### Data-Streamer
 Fetches data for events and num. of Covid-19 cases per State.
 
 ### CovidDataImporter
 Run `python3 import.py`
 
-###EventsDataStreamer
+### EventsDataStreamer
 Run Client.main
 
-###DataProcess
+### DataProcess
 Run `sbt run`
 
 
